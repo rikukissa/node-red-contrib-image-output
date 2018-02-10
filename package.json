@@ -10,6 +10,7 @@
       "image-output": "image-output/image-output.js"
     }
   },
+  "keywords": ["node-red"],
   "author": "Riku Rouvila",
   "license": "MIT"
 }
