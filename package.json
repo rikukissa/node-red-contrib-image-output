@@ -1,0 +1,15 @@
+{
+  "name": "red-contrib-image-output",
+  "version": "0.1.0",
+  "description": "Easy way of previewing and examining images in your flows",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "node-red": {
+    "nodes": {
+      "image-output": "image-output/image-output.js"
+    }
+  },
+  "author": "Riku Rouvila",
+  "license": "MIT"
+}

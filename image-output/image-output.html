@@ -1,0 +1,57 @@
+<script type="text/javascript">
+  RED.nodes.registerType('image-output', {
+    category: 'output',
+    color: '#a6bbcf',
+    defaults: {
+      name: { value: "" }
+    },
+    inputs: 1,
+    outputs: 0,
+    icon: "watch.png",
+    align: 'right',
+    label: function () {
+      return this.name || "Image output";
+    }
+  });
+
+  const latestImages = {}
+
+  function render(id, data) {
+    let $img = document.getElementById(`image-output-${id}`)
+
+    if(!$img) {
+      const $container = document.getElementById(id)
+      if(!$container) {
+        return
+      }
+
+      const img = document.createElementNS("http://www.w3.org/2000/svg", 'image')
+      img.setAttribute('id', `image-output-${id}`)
+      img.setAttribute('width', `200`)
+      img.setAttribute('y', `40`)
+      $container.insertBefore(img, $container.lastChild.nextSibling)
+      $img = img
+    }
+    $img.setAttribute('href', `data:image/png;base64,${data}`)
+
+  }
+
+  RED.events.on('workspace:change', () => {
+    Object.keys(latestImages).forEach((key) => {
+      render(key, latestImages[key])
+    })
+  })
+
+  RED.comms.subscribe('image', (event, data) => {
+    latestImages[data.id] = data.data
+    render(data.id, data.data)
+  })
+
+</script>
+
+<script type="text/x-red" data-template-name="image-output">
+  <div class="form-row">
+      <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+      <input type="text" id="node-input-name" placeholder="Name">
+  </div>
+</script>
