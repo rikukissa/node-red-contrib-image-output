@@ -17,25 +17,49 @@
   const latestImages = {}
 
   function render(id, data) {
-    let $img = document.getElementById(`image-output-${id}`)
+    let $img = document.getElementById(`image-output-img-${id}`)
 
-    if(!$img) {
+    if (!$img) {
       const $container = document.getElementById(id)
-      if(!$container) {
+      if (!$container) {
         return
       }
 
+      const $bubble = document.getElementById(`image-output-bubble-${id}`)
+      const bubble = document.createElementNS("http://www.w3.org/2000/svg", 'polygon')
+      bubble.setAttribute('id', `image-output-bubble-${id}`)
+      bubble.setAttribute('style', 'fill:#a6bbcf')
+      $container.insertBefore(bubble, $container.lastChild.nextSibling)
+
       const img = document.createElementNS("http://www.w3.org/2000/svg", 'image')
-      img.setAttribute('id', `image-output-${id}`)
+      img.setAttribute('id', `image-output-img-${id}`)
       img.setAttribute('width', `200`)
-      img.setAttribute('y', `40`)
+      img.setAttribute('y', `45`)
       $container.insertBefore(img, $container.lastChild.nextSibling)
       $img = img
     }
+
     $img.setAttribute('href', `data:image/png;base64,${data}`)
 
-  }
+    $img.onload = function () {
+      const bubbleId = this.id.replace("img", "bubble");
+      const $bubble = document.getElementById(bubbleId)
 
+      const imgBbox = this.getBBox()
+      const left = imgBbox.x - 5
+      const top = imgBbox.y - 5
+      const right = imgBbox.x + imgBbox.width + 5
+      const bottom = imgBbox.y + imgBbox.height + 5
+      const points = left + "," + top + " " +
+        (left + 50) + "," + top + " " +
+        (left + 55) + "," + (top - 10) + " " +
+        (left + 60) + "," + top + " " +
+        right + "," + top + " " +
+        right + "," + bottom + " " +
+        left + "," + bottom
+      $bubble.setAttribute('points', points)
+    }
+  }
   RED.events.on('workspace:change', () => {
     Object.keys(latestImages).forEach((key) => {
       render(key, latestImages[key])
