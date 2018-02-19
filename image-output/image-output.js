@@ -1,16 +1,59 @@
 module.exports = function(RED) {
+   var fs = require('fs');
+   var path = require('path');
+  
   function ImageNode(config) {
     RED.nodes.createNode(this, config);
     this.active = (config.active === null || typeof config.active === "undefined") || config.active;
+    this.content = null;
+        
+    function pushImage(data) {
+       RED.comms.publish("image", {
+            id: node.id,
+            data: data
+       });
+    }
+       
+    // Cache the no_image.png file
+    var filePath = path.join(__dirname, 'no_image.png');
+    this.noImage = fs.readFileSync(filePath).toString("base64"); 
+    
+    // Cache the incorrect_input.png file
+    filePath = path.join(__dirname, 'incorrect_input.png');
+    this.incorrectInput = fs.readFileSync(filePath).toString("base64");
+    
     var node = this;
+    
+    // Show a 'no image' at the start, in case no images will be pushed afterwards
+    pushImage(node.noImage);
 
     node.on("input", function(msg) {
-      if (this.active) {
-        RED.comms.publish("image", {
-          id: this.id,
-          data: msg.payload.toString("base64")
-        });
+      var data = null;
+      
+      if (Buffer.isBuffer(msg.payload) || typeof data === 'string') {
+        data = msg.payload.toString("base64");
+        node.contentType = "inputImage";
       }
+      else {
+        node.error("Input should be a Buffer or a string", msg);
+        
+        // It is useless to send a series of incorrect_input.png 
+        if (node.contentType === "incorrectInput") {
+            return;
+        }
+        
+        data = node.incorrectInput;
+        node.contentType = "incorrectInput";
+      }
+      
+      if (this.active) {
+        pushImage(data);
+      }
+    });
+    
+    node.on("close",function() {
+      // Clear the content type, to make sure the static images will be pushed again after a (re)deploy
+      node.contentType = null;
     });
   }
   RED.nodes.registerType("image-output", ImageNode);
