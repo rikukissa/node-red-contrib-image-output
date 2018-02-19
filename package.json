@@ -1,5 +1,5 @@
 {
-  "name": "red-contrib-image-output",
+  "name": "node-red-contrib-image-output",
   "version": "0.1.1",
   "description": "Easy way of previewing and examining images in your flows",
   "scripts": {
