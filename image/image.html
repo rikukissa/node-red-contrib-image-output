@@ -1,13 +1,14 @@
 <script type="text/javascript">
+  const DEFAULT_WIDTH = 200
   RED.nodes.registerType('image', {
     category: 'output',
     color: '#a6bbcf',
     defaults: {
       name: { value: "" },
       width: {
-        value: 200,
+        value: DEFAULT_WIDTH,
         required: true,
-        validate: RED.validators.number()
+        validate: (v) => !v || !isNaN(parseInt(v, 10))
       },
     },
     inputs: 1,
@@ -16,6 +17,10 @@
     align: 'right',
     label: function () {
       return this.name || "Image output";
+    },
+    oneditprepare: function() {
+      // Set a default width of 200 for existing nodes that don't have that field yet.
+      $('#node-input-width').val(this.width || DEFAULT_WIDTH);
     }
   });
 
@@ -49,7 +54,7 @@
 
       const img = document.createElementNS("http://www.w3.org/2000/svg", 'image')
       img.setAttribute('id', `image-output-img-${id}`)
-      img.setAttribute('width', node.width)
+      img.setAttribute('width', node.width || DEFAULT_WIDTH)
       img.setAttribute('y', `45`)
       $container.insertBefore(img, $container.lastChild.nextSibling)
       $img = img
