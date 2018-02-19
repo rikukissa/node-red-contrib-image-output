@@ -10,5 +10,5 @@ module.exports = function(RED) {
       });
     });
   }
-  RED.nodes.registerType("image-output", ImageNode);
+  RED.nodes.registerType("image", ImageNode);
 };
