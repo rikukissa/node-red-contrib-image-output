@@ -71,12 +71,14 @@
       const bubble = document.createElementNS("http://www.w3.org/2000/svg", 'polygon')
       bubble.setAttribute('id', `image-output-bubble-${id}`)
       bubble.setAttribute('style', 'fill:#a6bbcf')
+      bubble.setAttribute('cursor', "crosshair");
       $container.insertBefore(bubble, $container.lastChild.nextSibling)
 
       const img = document.createElementNS("http://www.w3.org/2000/svg", 'image')
       img.setAttribute('id', `image-output-img-${id}`)
       img.setAttribute('width', `200`)
       img.setAttribute('y', `45`)
+      img.setAttribute('cursor', "crosshair");
       $container.insertBefore(img, $container.lastChild.nextSibling)
       $img = img
     }
