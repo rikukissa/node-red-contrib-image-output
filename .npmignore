@@ -1,0 +1,4 @@
+.DS_Store
+.git
+.npmrc
+npm-debug.log
