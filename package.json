@@ -1,6 +1,6 @@
 {
-  "name": "red-contrib-image-output",
-  "version": "0.1.1",
+  "name": "node-red-contrib-image-output",
+  "version": "0.2.1",
   "description": "Easy way of previewing and examining images in your flows",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -15,7 +15,7 @@
   },
   "node-red": {
     "nodes": {
-      "image-output": "image-output/image-output.js"
+      "image": "image/image.js"
     }
   },
   "keywords": ["node-red", "image", "inspect"],
