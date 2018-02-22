@@ -13,7 +13,6 @@ module.exports = function(RED) {
       }
     });
   }
-  RED.nodes.registerType("image-output", ImageNode);
   
   // Via the button on the node (in the flow editor), the image pushing can be enabled or disabled
   RED.httpAdmin.post("/image-output/:id/:state", RED.auth.needsPermission("image-output.write"), function(req,res) {
@@ -33,4 +32,6 @@ module.exports = function(RED) {
         res.sendStatus(404);
     }
   });
+
+  RED.nodes.registerType("image", ImageNode);
 };

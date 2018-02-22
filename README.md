@@ -10,5 +10,5 @@ Expects received `msg.payload` to be either a buffer or a base64 string.
 ## Installation
 
 ```
-npm install --save red-contrib-image-output
+npm install --save node-red-contrib-image-output
 ```
