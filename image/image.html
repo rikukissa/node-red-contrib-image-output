@@ -1,10 +1,16 @@
 <script type="text/javascript">
+  const DEFAULT_WIDTH = 200
   RED.nodes.registerType('image', {
     category: 'output',
     color: '#a6bbcf',
     defaults: {
       active: {value:true},
-      name: { value: "" }
+      name: { value: "" },
+      width: {
+        value: DEFAULT_WIDTH,
+        required: true,
+        validate: (v) => !v || !isNaN(parseInt(v, 10))
+      },
     },
     inputs: 1,
     outputs: 0,
@@ -53,21 +59,36 @@
     },
     label: function () {
       return this.name || "Image output";
+    },
+    oneditprepare: function() {
+      // Set a default width of 200 for existing nodes that don't have that field yet.
+      $('#node-input-width').val(this.width || DEFAULT_WIDTH);
     }
   });
 
   const latestImages = {}
 
-  function render(id, data) {
-    let $img = document.getElementById(`image-output-img-${id}`)
+  function redraw(node) {
+    const id = node.id
+    const $img = document.getElementById(`image-output-img-${id}`)
+    const $bubble = document.getElementById(`image-output-bubble-${id}`)
 
+    $img && $img.remove()
+    $bubble && $bubble.remove()
+
+    if(latestImages[id]) {
+      render(id, latestImages[id], node)
+    }
+  }
+
+  function render(id, data, node) {
+    let $img = document.getElementById(`image-output-img-${id}`)
     if (!$img) {
       const $container = document.getElementById(id)
       if (!$container) {
         return
       }
 
-      const $bubble = document.getElementById(`image-output-bubble-${id}`)
       const bubble = document.createElementNS("http://www.w3.org/2000/svg", 'polygon')
       bubble.setAttribute('id', `image-output-bubble-${id}`)
       bubble.setAttribute('style', 'fill:#a6bbcf')
@@ -76,7 +97,7 @@
 
       const img = document.createElementNS("http://www.w3.org/2000/svg", 'image')
       img.setAttribute('id', `image-output-img-${id}`)
-      img.setAttribute('width', `200`)
+      img.setAttribute('width', node.width || DEFAULT_WIDTH)
       img.setAttribute('y', `45`)
       img.setAttribute('cursor', "crosshair");
       $container.insertBefore(img, $container.lastChild.nextSibling)
@@ -105,21 +126,27 @@
     }
   }
   RED.events.on('workspace:change', () => {
-    Object.keys(latestImages).forEach((key) => {
-      render(key, latestImages[key])
+    Object.keys(latestImages).forEach((id) => {
+      render(id, latestImages[id], RED.nodes.node(id))
     })
   })
 
+  RED.events.on("editor:save", redraw)
+
   RED.comms.subscribe('image', (event, data) => {
     latestImages[data.id] = data.data
-    render(data.id, data.data)
+    render(data.id, data.data, RED.nodes.node(data.id))
   })
 
 </script>
 
 <script type="text/x-red" data-template-name="image">
   <div class="form-row">
-      <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
-      <input type="text" id="node-input-name" placeholder="Name">
+    <label for="node-input-width"><i class="fa fa-arrows-h"></i> Width</label>
+    <input type="number" id="node-input-width">
+  </div>
+  <div class="form-row">
+    <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+    <input type="text" id="node-input-name" placeholder="Name">
   </div>
 </script>
