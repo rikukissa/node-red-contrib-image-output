@@ -18,18 +18,22 @@ module.exports = function(RED) {
   RED.httpAdmin.post("/image-output/:id/:state", RED.auth.needsPermission("image-output.write"), function(req,res) {
     var node = RED.nodes.getNode(req.params.id);
     var state = req.params.state;
-    if (node !== null && typeof node !== "undefined" ) {
-        if (state === "enable") {
-            node.active = true;
-            res.sendStatus(200);
-        } else if (state === "disable") {
-            node.active = false;
-            res.sendStatus(201);
-        } else {
-            res.sendStatus(404);
-        }
+    
+    const nodeExists = node !== null && typeof node !== "undefined"
+
+    if(!nodeExists) {
+      res.sendStatus(404);
+      return;  
+    }
+
+    if (state === "enable") {
+      node.active = true;
+      res.send('activated');
+    } else if (state === "disable") {
+      node.active = false;
+      res.send('deactivated');
     } else {
-        res.sendStatus(404);
+      res.sendStatus(404);
     }
   });
 
