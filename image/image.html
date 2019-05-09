@@ -15,7 +15,7 @@
     outputs: 0,
     icon: "watch.png",
     align: 'right',
-    paletteLabel: "image preview",
+    palettelabel: "image preview",
     label: function () {
       return this.name || "image preview";
     },
@@ -54,6 +54,8 @@
   }
 
   function render(id, data, node) {
+    let i = new Image();
+    i.src = "data:image/png;base64,"+data;
     let $img = document.getElementById(`image-output-img-${id}`)
     if (!$img) {
       const $container = document.getElementById(id)
@@ -67,8 +69,9 @@
 
       const img = document.createElementNS("http://www.w3.org/2000/svg", 'image')
       img.setAttribute('id', `image-output-img-${id}`)
-      img.setAttribute('width', node.width || DEFAULT_WIDTH)
+      img.setAttribute('x', '0')
       img.setAttribute('y', '45')
+      img.setAttribute('width', node.width || DEFAULT_WIDTH)
       img.setAttribute('onclick','remove("'+id+'")')
       $container.insertBefore(img, $container.lastChild.nextSibling)
       $img = img
@@ -77,9 +80,14 @@
     $img.setAttribute('href', `data:image/png;base64,${data}`)
 
     $img.onload = function () {
+      $img.setAttribute('height', node.width * i.height / i.width)
       const bubbleId = this.id.replace("img", "bubble");
       const $bubble = document.getElementById(bubbleId)
-      const imgBbox = this.getBBox()
+      let imgBbox = this.getBBox()
+      imgBbox.x = 0;
+      imgBbox.y = 45;
+      imgBbox.width = imgBbox.width || node.width || DEFAULT_WIDTH;
+      imgBbox.height = imgBbox.height || node.width * i.height / i.width;
       const left = imgBbox.x
       const top = imgBbox.y + 2
       const right = imgBbox.x + imgBbox.width
