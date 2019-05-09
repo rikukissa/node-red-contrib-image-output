@@ -77,13 +77,11 @@
       $img = img
     }
 
-    $img.setAttribute('href', `data:image/png;base64,${data}`)
-
-    $img.onload = function () {
+    i.onload = function () {
       $img.setAttribute('height', node.width * i.height / i.width)
-      const bubbleId = this.id.replace("img", "bubble");
+      const bubbleId = $img.id.replace("img", "bubble");
       const $bubble = document.getElementById(bubbleId)
-      let imgBbox = this.getBBox()
+      let imgBbox = $img.getBBox()
       imgBbox.x = 0;
       imgBbox.y = 45;
       imgBbox.width = imgBbox.width || node.width || DEFAULT_WIDTH;
@@ -101,6 +99,8 @@
         left + "," + (top - 21)
       $bubble.setAttribute('points', points)
     }
+
+    $img.setAttribute('href', `data:image/png;base64,${data}`)
   }
 
   RED.events.on("editor:save", redraw)
