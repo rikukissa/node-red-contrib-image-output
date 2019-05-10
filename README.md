@@ -4,7 +4,7 @@ Simple image output node. Useful for previewing results of face detecting, objec
 
 ![](https://raw.githubusercontent.com/rikukissa/node-red-contrib-image-output/master/.github/preview.png)
 
-Expects received `msg.payload` to be either a buffer or a base64 string of a jpg or png image.
+Expects received `msg.payload` to contain either a buffer or a base64 string of a jpg or png image.
 
 ## Installation
 
