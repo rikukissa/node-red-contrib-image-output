@@ -1,12 +1,12 @@
 <script type="text/javascript">
-  const DEFAULT_WIDTH = 160
+  const DEFAULT_IMAGE_WIDTH = 160
   RED.nodes.registerType('image', {
     category: 'output',
     color: '#a6bbcf',
     defaults: {
       name: { value: "" },
       width: {
-        value: DEFAULT_WIDTH,
+        value: DEFAULT_IMAGE_WIDTH,
         required: true,
         validate: function(v) { return !v || !isNaN(parseInt(v, 10)) }
       },
@@ -24,7 +24,7 @@
     },
     oneditprepare: function() {
       // Set a default width of 160 for existing nodes that don't have that field yet.
-      $('#node-input-width').val(this.width || DEFAULT_WIDTH);
+      $('#node-input-width').val(this.width || DEFAULT_IMAGE_WIDTH);
     }
   });
 
@@ -70,7 +70,7 @@
       img.setAttribute('id', "image-output-img-"+id)
       img.setAttribute('x', '0')
       img.setAttribute('y', '45')
-      img.setAttribute('width', node.width || DEFAULT_WIDTH)
+      img.setAttribute('width', node.width || DEFAULT_IMAGE_WIDTH)
       img.setAttribute('onclick','remove("'+id+'")')
       $container.insertBefore(img, $container.lastChild.nextSibling)
       $img = img
@@ -83,7 +83,7 @@
       let imgBbox = {}
       imgBbox.x = 0;
       imgBbox.y = 45;
-      imgBbox.width = node.width || DEFAULT_WIDTH;
+      imgBbox.width = node.width || DEFAULT_IMAGE_WIDTH;
       imgBbox.height = parseInt(node.width * i.height / i.width);
       const left = imgBbox.x
       const top = imgBbox.y + 2
