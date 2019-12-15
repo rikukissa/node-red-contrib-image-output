@@ -1,5 +1,5 @@
 <script type="text/javascript">
-  const DEFAULT_WIDTH = 200
+  const DEFAULT_WIDTH = 160
   RED.nodes.registerType('image', {
     category: 'output',
     color: '#a6bbcf',
@@ -8,138 +8,114 @@
       width: {
         value: DEFAULT_WIDTH,
         required: true,
-        validate: (v) => !v || !isNaN(parseInt(v, 10))
+        validate: function(v) { return !v || !isNaN(parseInt(v, 10)) }
       },
-      active: {value:true}
+      thumbnail: {
+        value: false;
+      }
     },
     inputs: 1,
     outputs: 0,
     icon: "watch.png",
     align: 'right',
-    button: {
-      toggle: "active",
-      onclick: function() {
-        const label = this.name || "Image output";
-        var node = this;
-        $.ajax({
-          url: `image-output/${this.id}/${this.active ? 'enable' : 'disable'}`,
-          type: "POST",
-          success: function(resp, textStatus, xhr) {
-            const historyEvent = {
-              t:'edit',
-              node:node,
-              changes:{
-                active: !node.active
-              },
-              dirty:node.dirty,
-              changed:node.changed
-            };
-            node.changed = true;
-            node.dirty = true;
-            RED.nodes.dirty(true);
-            RED.history.push(historyEvent);
-            RED.view.redraw();
-            if (xhr.status == 200) {
-              RED.notify("Successfully " + resp + ": " + label, "success");
-            }
-          },
-          error: function(jqXHR,textStatus,errorThrown) {
-            var message;
-            
-            switch (jqXHR.status) {
-              case 404:
-                message = "node not deployed";
-                break;
-              case 0:
-                message = "no response from server";
-                break;
-              default:
-                message = `unexpected error (${textStatus}) ${errorThrown}`;
-            }
-            
-            RED.notify(`<strong>Error</strong>: ${message}`, "error");
-          }
-        });
-      }
-    },
+    palettelabel: "image preview",
     label: function () {
-      return this.name || "Image output";
+      return this.name || "image preview";
+    },
+    labelStyle: function() {
+      return this.name?"node_label_italic":"";
     },
     oneditprepare: function() {
-      // Set a default width of 200 for existing nodes that don't have that field yet.
+      // Set a default width of 160 for existing nodes that don't have that field yet.
       $('#node-input-width').val(this.width || DEFAULT_WIDTH);
     }
   });
 
   const latestImages = {}
 
+  function remove(nodeid) {
+    const id = nodeid
+    const $img = document.getElementById("image-output-img-"+id)
+    const $bubble = document.getElementById("image-output-bubble-"+id)
+
+    $img && $img.remove()
+    $bubble && $bubble.remove()
+    delete latestImages[id]
+  }
+
   function redraw(node) {
     const id = node.id
-    const $img = document.getElementById(`image-output-img-${id}`)
-    const $bubble = document.getElementById(`image-output-bubble-${id}`)
+    const $img = document.getElementById("image-output-img-"+id)
+    const $bubble = document.getElementById("image-output-bubble-"+id)
 
     $img && $img.remove()
     $bubble && $bubble.remove()
 
-    if(latestImages[id]) {
+    if (latestImages[id]) {
       render(id, latestImages[id], node)
     }
   }
 
   function render(id, data, node) {
-    let $img = document.getElementById(`image-output-img-${id}`)
+    let i = new Image();
+    let $img = document.getElementById("image-output-img-"+id)
     if (!$img) {
       const $container = document.getElementById(id)
-      if (!$container) {
-        //console.log("Cannot find container element with id " + id);
-        return
-      }
+      if (!$container) { return }
 
-      const bubble = document.createElementNS("http://www.w3.org/2000/svg", 'polygon')
-      bubble.setAttribute('id', `image-output-bubble-${id}`)
-      bubble.setAttribute('style', 'fill:#a6bbcf')
+      const bubble = document.createElementNS("http://www.w3.org/2000/svg", 'polyline')
+      bubble.setAttribute('id', "image-output-bubble-"+id)
+      bubble.setAttribute('style', 'fill:#A7BBCE')
+      bubble.setAttribute('stroke', '#999999')
       $container.insertBefore(bubble, $container.lastChild.nextSibling)
 
       const img = document.createElementNS("http://www.w3.org/2000/svg", 'image')
-      img.setAttribute('id', `image-output-img-${id}`)
+      img.setAttribute('id', "image-output-img-"+id)
+      img.setAttribute('x', '0')
+      img.setAttribute('y', '45')
       img.setAttribute('width', node.width || DEFAULT_WIDTH)
-      img.setAttribute('y', `45`)
+      img.setAttribute('onclick','remove("'+id+'")')
       $container.insertBefore(img, $container.lastChild.nextSibling)
       $img = img
     }
 
-    $img.setAttribute('href', `data:image/png;base64,${data}`)
-
-    $img.onload = function () {
-      const bubbleId = this.id.replace("img", "bubble");
+    i.onload = function () {
+      $img.setAttribute('height', node.width * i.height / i.width)
+      const bubbleId = $img.id.replace("img", "bubble");
       const $bubble = document.getElementById(bubbleId)
-
-      const imgBbox = this.getBBox()
-      const left = imgBbox.x - 5
-      const top = imgBbox.y - 5
-      const right = imgBbox.x + imgBbox.width + 5
-      const bottom = imgBbox.y + imgBbox.height + 5
-      const points = left + "," + top + " " +
-        (left + 50) + "," + top + " " +
-        (left + 55) + "," + (top - 10) + " " +
-        (left + 60) + "," + top + " " +
+      let imgBbox = {}
+      imgBbox.x = 0;
+      imgBbox.y = 45;
+      imgBbox.width = node.width || DEFAULT_WIDTH;
+      imgBbox.height = parseInt(node.width * i.height / i.width);
+      const left = imgBbox.x
+      const top = imgBbox.y + 2
+      const right = imgBbox.x + imgBbox.width
+      const bottom = imgBbox.y + imgBbox.height
+      const points =
+        (left + 4) + "," + (top - 17) + " " +
+        (left + 4) + "," + top + " " +
         right + "," + top + " " +
         right + "," + bottom + " " +
-        left + "," + bottom
+        left + "," + bottom + " " +
+        left + "," + (top - 21)
       $bubble.setAttribute('points', points)
     }
+
+    $img.setAttribute('href', "data:image/png;base64,"+data)
+    i.src = "data:image/png;base64,"+data;
   }
-  RED.events.on('workspace:change', () => {
-    Object.keys(latestImages).forEach((id) => {
-      render(id, latestImages[id], RED.nodes.node(id))
-    })
-  })
 
   RED.events.on("editor:save", redraw)
 
-  RED.comms.subscribe('image', (event, data) => {
-    latestImages[data.id] = data.data
-    render(data.id, data.data, RED.nodes.node(data.id))
+  RED.comms.subscribe('image', function(event, data) {
+    if (data.hasOwnProperty("data")) {
+        latestImages[data.id] = data.data
+        render(data.id, data.data, RED.nodes.node(data.id))
+    }
+    else {
+        remove(data.id);
+    }
   })
 
 </script>
@@ -150,7 +126,16 @@
     <input type="number" id="node-input-width">
   </div>
   <div class="form-row">
+    <input type="checkbox" id="node-input-thumbnail" style="display: inline-block; width: auto; vertical-align: top;">
+    <label for="node-input-thumbnail" style="width:70%;"> Show thumbnail images (to reduce bandwidth)</label>
+  </div> 
+  <div class="form-row">
     <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
     <input type="text" id="node-input-name" placeholder="Name">
   </div>
+</script>
+
+<script type="text/x-red" data-help-name="image">
+    <p>Simple image output node. Useful for previewing results of face detecting, object recognition etc.</p>
+    <p>Expects <code>msg.payload</code> to contain either a buffer or a base64 string of a jpg or png image.</p>
 </script>
