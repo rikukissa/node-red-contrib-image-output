@@ -18,7 +18,7 @@ npm install --save node-red-contrib-image-output
 ### Width
 The width (in pixels) that the image needs to be displayed in the flow.  The height will be calculated automatically, with the same aspect ratio as the original image.
 
-### Show thumbnail images
-When activated, the input image will be resized automatically (to the specified) width.  This way the bandwith can be reduced, i.e. the number of bytes that is being send across the network.  When too much data is pushed (across the websocket), the flow editor can become ***unresponse***!
+### Transfer thumbnail images
+When activated, the input image will be resized automatically (to the specified) width.  By transferring smaller images the bandwith can be reduced, i.e. the number of bytes that is being send across the network.  When too much data is pushed (across the websocket), the flow editor can become ***unresponse***!
 
 Caution: resizing images will require server-side CPU usage.  So it has decided what is required: lower bandwidth or lower cpu usage.  This decision will depend on the use case...
