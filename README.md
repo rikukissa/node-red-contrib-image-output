@@ -1,4 +1,4 @@
-# ðŸž node-red-contrib-image-output
+# 🏞 node-red-contrib-image-output
 
 Simple image output node. Useful for previewing images (of face detecting, object recognition etc...) inside the Node-RED flow editor.
 
