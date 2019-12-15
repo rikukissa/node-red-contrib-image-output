@@ -30,45 +30,36 @@
       $('#node-input-width').val(this.width || DEFAULT_IMAGE_WIDTH);
     }
   });
-  
   const latestImages = {}
-
   function remove(nodeid) {
     const id = nodeid
     const $img = document.getElementById("image-output-img-"+id)
     const $bubble = document.getElementById("image-output-bubble-"+id)
-
     $img && $img.remove()
     $bubble && $bubble.remove()
     delete latestImages[id]
   }
-
   function redraw(node) {
     const id = node.id
     const $img = document.getElementById("image-output-img-"+id)
     const $bubble = document.getElementById("image-output-bubble-"+id)
-
     $img && $img.remove()
     $bubble && $bubble.remove()
-
     if (latestImages[id]) {
       render(id, latestImages[id], node)
     }
   }
-
   function render(id, data, node) {
     let i = new Image();
     let $img = document.getElementById("image-output-img-"+id)
     if (!$img) {
       const $container = document.getElementById(id)
       if (!$container) { return }
-
       const bubble = document.createElementNS("http://www.w3.org/2000/svg", 'polyline')
       bubble.setAttribute('id', "image-output-bubble-"+id)
       bubble.setAttribute('style', 'fill:#A7BBCE')
       bubble.setAttribute('stroke', '#999999')
       $container.insertBefore(bubble, $container.lastChild.nextSibling)
-
       const img = document.createElementNS("http://www.w3.org/2000/svg", 'image')
       img.setAttribute('id', "image-output-img-"+id)
       img.setAttribute('x', '0')
@@ -78,7 +69,6 @@
       $container.insertBefore(img, $container.lastChild.nextSibling)
       $img = img
     }
-
     i.onload = function () {
       $img.setAttribute('height', node.width * i.height / i.width)
       const bubbleId = $img.id.replace("img", "bubble");
@@ -101,13 +91,10 @@
         left + "," + (top - 21)
       $bubble.setAttribute('points', points)
     }
-
     $img.setAttribute('href', "data:image/png;base64,"+data)
     i.src = "data:image/png;base64,"+data;
   }
-
   RED.events.on("editor:save", redraw)
-
   RED.comms.subscribe('image', function(event, data) {
     if (data.hasOwnProperty("data")) {
         latestImages[data.id] = data.data
@@ -117,7 +104,6 @@
         remove(data.id);
     }
   })
-
 </script>
 
 <script type="text/x-red" data-template-name="image">
