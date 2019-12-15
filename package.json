@@ -1,9 +1,13 @@
+  
 {
   "name": "node-red-contrib-image-output",
-  "version": "0.4.3",
+  "version": "0.5.0",
   "description": "Easy way of previewing and examining images in your flows",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "jimp": "0.9.3"
   },
   "bugs": {
     "url": "https://github.com/rikukissa/node-red-contrib-image-output/issues"
