@@ -1,41 +1,23 @@
 module.exports = function(RED) {
-  function ImageNode(config) {
-    RED.nodes.createNode(this, config);
-    this.active = (config.active === null || typeof config.active === "undefined") || config.active;
-    var node = this;
+    function ImageNode(config) {
+        RED.nodes.createNode(this, config);
+        var node = this;
 
-    node.on("input", function(msg) {
-      if (this.active) {
-        RED.comms.publish("image", {
-          id: this.id,
-          data: msg.payload.toString("base64")
+        node.on("input", function(msg) {
+            try {
+                var data = msg.payload.toString("base64")
+                RED.comms.publish("image", { id:this.id, data:data });
+                if (msg.hasOwnProperty("filename")) { node.status({text:" "+msg.filename}); }
+            }
+            catch(e) {
+                node.error("Invalid image",msg);
+            }
         });
-      }
-    });
-  }
-  
-  // Via the button on the node (in the flow editor), the image pushing can be enabled or disabled
-  RED.httpAdmin.post("/image-output/:id/:state", RED.auth.needsPermission("image-output.write"), function(req,res) {
-    var node = RED.nodes.getNode(req.params.id);
-    var state = req.params.state;
-    
-    const nodeExists = node !== null && typeof node !== "undefined"
 
-    if(!nodeExists) {
-      res.sendStatus(404);
-      return;  
+        node.on("close", function() {
+            RED.comms.publish("image", { id:this.id });
+            node.status({});
+        });
     }
-
-    if (state === "enable") {
-      node.active = true;
-      res.send('activated');
-    } else if (state === "disable") {
-      node.active = false;
-      res.send('deactivated');
-    } else {
-      res.sendStatus(404);
-    }
-  });
-
-  RED.nodes.registerType("image", ImageNode);
+    RED.nodes.registerType("image", ImageNode);
 };
