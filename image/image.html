@@ -30,36 +30,45 @@
       $('#node-input-width').val(this.width || DEFAULT_IMAGE_WIDTH);
     }
   });
+  
   const latestImages = {}
+
   function remove(nodeid) {
     const id = nodeid
     const $img = document.getElementById("image-output-img-"+id)
     const $bubble = document.getElementById("image-output-bubble-"+id)
+
     $img && $img.remove()
     $bubble && $bubble.remove()
     delete latestImages[id]
   }
+
   function redraw(node) {
     const id = node.id
     const $img = document.getElementById("image-output-img-"+id)
     const $bubble = document.getElementById("image-output-bubble-"+id)
+
     $img && $img.remove()
     $bubble && $bubble.remove()
+
     if (latestImages[id]) {
       render(id, latestImages[id], node)
     }
   }
+
   function render(id, data, node) {
     let i = new Image();
     let $img = document.getElementById("image-output-img-"+id)
     if (!$img) {
       const $container = document.getElementById(id)
       if (!$container) { return }
+
       const bubble = document.createElementNS("http://www.w3.org/2000/svg", 'polyline')
       bubble.setAttribute('id', "image-output-bubble-"+id)
       bubble.setAttribute('style', 'fill:#A7BBCE')
       bubble.setAttribute('stroke', '#999999')
       $container.insertBefore(bubble, $container.lastChild.nextSibling)
+
       const img = document.createElementNS("http://www.w3.org/2000/svg", 'image')
       img.setAttribute('id', "image-output-img-"+id)
       img.setAttribute('x', '0')
@@ -69,6 +78,7 @@
       $container.insertBefore(img, $container.lastChild.nextSibling)
       $img = img
     }
+
     i.onload = function () {
       $img.setAttribute('height', node.width * i.height / i.width)
       const bubbleId = $img.id.replace("img", "bubble");
@@ -91,10 +101,13 @@
         left + "," + (top - 21)
       $bubble.setAttribute('points', points)
     }
+
     $img.setAttribute('href', "data:image/png;base64,"+data)
     i.src = "data:image/png;base64,"+data;
   }
+
   RED.events.on("editor:save", redraw)
+
   RED.comms.subscribe('image', function(event, data) {
     if (data.hasOwnProperty("data")) {
         latestImages[data.id] = data.data
@@ -104,6 +117,7 @@
         remove(data.id);
     }
   })
+
 </script>
 
 <script type="text/x-red" data-template-name="image">
@@ -114,7 +128,7 @@
   <div class="form-row">
     <label>&nbsp;</label>
     <input type="checkbox" id="node-input-thumbnail" style="display: inline-block; width: auto; vertical-align: top;">
-    <label for="node-input-thumbnail" style="width:70%;"> Transfer thumbnail images (to reduce bandwidth)</label>
+    <label for="node-input-thumbnail" style="width:70%;"> Resize images on server side</label>
   </div> 
   <div class="form-row">
     <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
@@ -126,7 +140,12 @@
     <p>Simple image output node. Useful for previewing results of face detecting, object recognition etc.</p>
     <p>Expects <code>msg.payload</code> to contain either a buffer or a base64 string of a jpg or png image.</p>
     <p><strong>Width:</strong><br/>
-    The width (in pixels) that the image needs to be displayed in the flow.</p>     
-    <p><strong>Transfer thumbnail images:</strong><br/>
-    Resize the images (to the specified) width, to reduce the bandwith.  When too much data is pushed, the flow editor can become unresponse!</p> 
+    The width (in pixels) that the image needs to be displayed in the flow.</p>  
+    <p><strong>Resize images on server side:</strong><br/>
+    When too much data is pushed to the browser, the flow editor can become unresponse!
+    <ul>
+        <li>When activated, the images will be resized (to the specified width) on the server side.  Then those small thumbnail images will be send to the browser, to reduce the bandwith.</li>
+        <li>When not activated, the (original) large images will be send to the browser.  Once they arrive there, the browser will resize them to the specified width.</li>
+    </ul>
+    </p> 
 </script>
