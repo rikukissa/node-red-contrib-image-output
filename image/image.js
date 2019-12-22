@@ -5,6 +5,7 @@ module.exports = function(RED) {
         RED.nodes.createNode(this, config);
         this.imageWidth = config.width;
         this.thumbnail = config.thumbnail;
+        this.active = (config.active === null || typeof config.active === "undefined") || config.active;
         
         var node = this;
         
@@ -24,6 +25,10 @@ module.exports = function(RED) {
 
         node.on("input", function(msg) {
             var image = msg.payload;
+            
+            if (this.active !== true) {
+                return;
+            }
             
             if (!Buffer.isBuffer(image) && (typeof image !== 'string') && !(image instanceof String)) {
                 node.error("Input should be a buffer or a base64 string (containing a jpg or png image)");
@@ -71,4 +76,27 @@ module.exports = function(RED) {
         });
     }
     RED.nodes.registerType("image", ImageNode);
+    
+    // Via the button on the node (in the FLOW EDITOR), the image pushing can be enabled or disabled
+    RED.httpAdmin.post("/image-output/:id/:state", RED.auth.needsPermission("image-output.write"), function(req,res) {
+        var state = req.params.state;
+        var node = RED.nodes.getNode(req.params.id);
+        
+        if(node === null || typeof node === "undefined") {
+            res.sendStatus(404);
+            return;  
+        }
+
+        if (state === "enable") {
+            node.active = true;
+            res.send('activated');
+        }
+        else if (state === "disable") {
+            node.active = false;
+            res.send('deactivated');
+        }
+        else {
+            res.sendStatus(404);
+        }
+  });
 };

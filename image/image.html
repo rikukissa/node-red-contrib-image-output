@@ -12,6 +12,9 @@
       },
       thumbnail: {
         value: false
+      },
+      active: {
+        value: true
       }
     },
     inputs: 1,
@@ -24,6 +27,52 @@
     },
     labelStyle: function() {
       return this.name?"node_label_italic":"";
+    },
+    button: {
+      toggle: "active",
+      onclick: function() {
+        const label = this.name || "image preview";
+        var node = this;
+        $.ajax({
+          url: `image-output/${this.id}/${this.active ? 'enable' : 'disable'}`,
+          type: "POST",
+          success: function(resp, textStatus, xhr) {
+            const historyEvent = {
+              t:'edit',
+              node:node,
+              changes:{
+                active: !node.active
+              },
+              dirty:node.dirty,
+              changed:node.changed
+            };
+            node.changed = true;
+            node.dirty = true;
+            RED.nodes.dirty(true);
+            RED.history.push(historyEvent);
+            RED.view.redraw();
+            if (xhr.status == 200) {
+              RED.notify("Successfully " + resp + ": " + label, "success");
+            }
+          },
+          error: function(jqXHR,textStatus,errorThrown) {
+            var message;
+            
+            switch (jqXHR.status) {
+              case 404:
+                message = "node not deployed";
+                break;
+              case 0:
+                message = "no response from server";
+                break;
+              default:
+                message = `unexpected error (${textStatus}) ${errorThrown}`;
+            }
+            
+            RED.notify(`<strong>Error</strong>: ${message}`, "error");
+          }
+        });
+      }
     },
     oneditprepare: function() {
       // Set a default width of 160 for existing nodes that don't have that field yet.
