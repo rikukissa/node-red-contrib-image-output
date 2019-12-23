@@ -4,8 +4,10 @@ Simple image output node. Useful for previewing images (of face detecting, objec
 
 ![](https://raw.githubusercontent.com/rikukissa/node-red-contrib-image-output/master/.github/preview.png)
 
-Expects the `msg.payload` to contain a jpg or png image, which need to be either a buffer or a base64 string.
-
+The expected input should be a jpg or png image, which need to be delivered in one of the following formats: 
++ A buffer
++ A base64 encoded string
++ A Jimp object
 
 ## Installation
 Run the following npm command in your Node-RED user directory (typically ~/.node-red):
@@ -51,7 +53,7 @@ Remark: the node-red-contrib-image-tools node should be installed, prior to impo
 The width (in pixels) that the image needs to be displayed in the flow.  The height will be calculated automatically, with the same aspect ratio as the original image.
 
 ## Image
-Specify how the input image will be delivered to this node.
+Specify how the input image will be delivered to this node.  By default the image needs to be delivered in the ```msg.payload``` of the input message.
 
 ### Resize images on server side
 By transferring smaller images the bandwith can be reduced, i.e. the number of bytes that is being send across the network.  When too much data is pushed (across the websocket), the flow editor can become ***unresponse***!
