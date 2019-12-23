@@ -10,6 +10,14 @@
         required: true,
         validate: function(v) { return !v || !isNaN(parseInt(v, 10)) }
       },
+      data: {
+        value: "payload",
+        required: true,
+        validate: RED.validators.typedInput("dataType")
+      },
+      dataType: {
+        value: "msg"
+      },
       thumbnail: {
         value: false
       },
@@ -77,6 +85,12 @@
     oneditprepare: function() {
       // Set a default width of 160 for existing nodes that don't have that field yet.
       $('#node-input-width').val(this.width || DEFAULT_IMAGE_WIDTH);
+
+      $('#node-input-data').typedInput({
+        default: 'msg',
+        typeField: $("#node-input-dataType"),
+        types: ['msg','flow','global','str','bin']
+      });
     }
   });
   
@@ -175,6 +189,11 @@
     <input type="number" id="node-input-width">
   </div>
   <div class="form-row">
+    <label style="padding-top: 8px" for="node-input-data"><i class="fa fa-file-image-o"></i> Image</label>
+    <input type="text" id="node-input-data" style="width:70%">
+    <input type="hidden" id="node-input-dataType">
+  </div>
+  <div class="form-row">
     <label>&nbsp;</label>
     <input type="checkbox" id="node-input-thumbnail" style="display: inline-block; width: auto; vertical-align: top;">
     <label for="node-input-thumbnail" style="width:70%;"> Resize images on server side</label>
@@ -187,7 +206,14 @@
 
 <script type="text/x-red" data-help-name="image">
     <p>Simple image output node. Useful for previewing results of face detecting, object recognition etc.</p>
-    <p>Expects <code>msg.payload</code> to contain either a buffer or a base64 string of a jpg or png image.</p>
+    <p>The button on the node can be used to enable or disable its image output. It is recommended (for performance) to disable or remove any Image-Output nodes that are not being used.</p>
+    <p>Expects in the <code>msg.payload</code> a jpg or png image, in one of the following formats:
+    <ul>
+        <li>A base64 encoded string</li>
+        <li>A buffer</li>
+        <li>A Jimp image object</li>
+    </ul>
+    </p>
     <p><strong>Width:</strong><br/>
     The width (in pixels) that the image needs to be displayed in the flow.</p>  
     <p><strong>Resize images on server side:</strong><br/>
