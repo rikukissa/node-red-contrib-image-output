@@ -4,8 +4,10 @@ module.exports = function(RED) {
     function ImageNode(config) {
         RED.nodes.createNode(this, config);
         this.imageWidth = config.width;
-        this.thumbnail = config.thumbnail;
-        this.active = (config.active === null || typeof config.active === "undefined") || config.active;
+        this.data       = config.data || "";
+        this.dataType   = config.dataType || "msg";
+        this.thumbnail  = config.thumbnail;
+        this.active     = (config.active === null || typeof config.active === "undefined") || config.active;
         
         var node = this;
         
@@ -21,52 +23,101 @@ module.exports = function(RED) {
             catch(e) {
                 node.error("Invalid image", msg);
             }
-        } 
+        }
+        
+        function handleError(err, msg, statusText) {
+            console.error(err);
+            node.error(err, msg);
+            node.status({ fill: "red", shape: "dot", text: statusText });
+		}
+        
+        function resizeJimpImage(jimpImage, msg) {
+            // Resize the width as specified in the config screen, and scale the height accordingly (preserving aspect ratio)
+            jimpImage.resize(250, Jimp.AUTO);
+            
+            // Convert the resized image to a base64 string
+            jimpImage.getBase64(Jimp.AUTO, (err, base64) => {
+                if (err) {
+                    // Log the error and keep the original image (at its original size)
+                    console.error(err);
+                    sendImageToClient(image, msg);
+                }
+                else {
+                    // Keep the base64 image from the data url
+                    base64 = base64.replace(/^data:image\/png;base64,/, "");
+                    
+                    sendImageToClient(base64, msg);
+                }
+            })
+        }
+        
+        function isJimpObject(image) {
+            // For some reason "instanceof Jimp" does not always work...
+            // See https://discourse.nodered.org/t/checking-object-instance/19482
+            return (image instanceof Jimp) || (image.constructor && (image.constructor.name === "Jimp"));
+        }
 
         node.on("input", function(msg) {
-            var image = msg.payload;
+            var image;
             
             if (this.active !== true) {
                 return;
             }
             
-            if (!Buffer.isBuffer(image) && (typeof image !== 'string') && !(image instanceof String)) {
-                node.error("Input should be a buffer or a base64 string (containing a jpg or png image)");
+            node.status({});
+            
+            // Get the image from the location specified in the typedinput field
+            RED.util.evaluateNodeProperty(node.data, node.dataType, node, msg, (err, value) => {
+                if (err) {
+                    handleError(err, msg, "Invalid source");
+                    return;
+                } else {
+                    image = value;
+                }
+            });
+            
+            if (!image) {
+                nodeStatusError(err, msg, "No image");
+                return;
+            }
+        
+            if (!Buffer.isBuffer(image) && (typeof image !== 'string') && !(image instanceof String) && !isJimpObject(image)) {
+                node.error("Input should be a buffer or a base64 string or a Jimp image (containing a jpg or png image)");
                 return;
             }
             
             if (node.thumbnail) {
-                if (!Buffer.isBuffer(image)) {
-                    // Convert the base64 string to a buffer, so Jimp can process it
-                    image = new Buffer(image, 'base64');
+                if (isJimpObject(image)) {
+                    // Use the input Jimp image straigth away, for maximum performance
+                    resizeJimpImage(image, msg);
                 }
-                
-                Jimp.read(image).then(function(img) {
-                    // Resize the width as specified in the config screen, and scale the height accordingly (preserving aspect ratio)
-                    img.resize(250, Jimp.AUTO);
+                else {
+                    if (!Buffer.isBuffer(image)) {
+                        // Convert the base64 string to a buffer, so Jimp can process it
+                        image = new Buffer(image, 'base64');
+                    }
                     
-                    // Convert the resized image to a base64 string
-                    img.getBase64(Jimp.AUTO, (err, base64) => {
-                        if (err) {
-                            // Log the error and keep the original image (at its original size)
-                            console.error(err);
-                            sendImageToClient(image, msg);
-                        }
-                        else {
-                            // Keep the base64 image from the data url
-                            base64 = base64.replace(/^data:image\/png;base64,/, "");
-                            
-                            sendImageToClient(base64, msg);
-                        }
-                    })
-                }).catch(function(err) {
-                    // Log the error and keep the original image (at its original size)
-                    console.error(err);
-                    sendImageToClient(image, msg);
-                });
+                    Jimp.read(image).then(function(jimpImage) {
+                        resizeJimpImage(jimpImage, msg);       
+                    }).catch(function(err) {
+                        // Log the error and keep the original image (at its original size)
+                        handleError(err, msg, "Resize failed");
+                        sendImageToClient(image, msg);
+                    });
+                }
             }
             else {    
-                sendImageToClient(image, msg);
+                if (isJimpObject(image)) {
+                    image.getBase64(Jimp.AUTO, (err, base64) => {
+                        // Keep the base64 image from the data url
+                        base64 = base64.replace(/^data:image\/png;base64,/, "");
+                    
+                        sendImageToClient(base64, msg);
+                    })
+                }
+                else {
+                    sendImageToClient(image, msg);
+                }
             }
         });
 
