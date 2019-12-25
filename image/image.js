@@ -1,5 +1,5 @@
 module.exports = function(RED) {
-    var Jimp = require('jimp'); 
+    var Jimp = require('jimp-compact'); 
     
     function ImageNode(config) {
         RED.nodes.createNode(this, config);
@@ -76,8 +76,9 @@ module.exports = function(RED) {
                 }
             });
             
-            if (!image) {
-                nodeStatusError(err, msg, "No image");
+            // Reset the image in case an emtpy payload arrives
+            if (!image || image === "") {
+                sendImageToClient(null, msg);
                 return;
             }
         
