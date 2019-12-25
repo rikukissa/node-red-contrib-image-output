@@ -1,5 +1,5 @@
 module.exports = function(RED) {
-    var Jimp = require('jimp'); 
+    var Jimp = require('jimp-compact'); 
     
     function ImageNode(config) {
         RED.nodes.createNode(this, config);
@@ -44,7 +44,7 @@ module.exports = function(RED) {
                 }
                 else {
                     // Keep the base64 image from the data url
-                    base64 = base64.replace(/^data:image\/png;base64,/, "");
+                    base64 = base64.replace(/^data:image\/[a-z]+;base64,/, "");
                     
                     sendImageToClient(base64, msg);
                 }
@@ -76,8 +76,9 @@ module.exports = function(RED) {
                 }
             });
             
-            if (!image) {
-                nodeStatusError(err, msg, "No image");
+            // Reset the image in case an emtpy payload arrives
+            if (!image || image === "") {
+                sendImageToClient(null, msg);
                 return;
             }
         
@@ -110,7 +111,7 @@ module.exports = function(RED) {
                 if (isJimpObject(image)) {
                     image.getBase64(Jimp.AUTO, (err, base64) => {
                         // Keep the base64 image from the data url
-                        base64 = base64.replace(/^data:image\/png;base64,/, "");
+                        base64 = base64.replace(/^data:image\/[a-z]+;base64,/, "");
                     
                         sendImageToClient(base64, msg);
                     })
