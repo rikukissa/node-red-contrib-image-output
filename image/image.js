@@ -12,12 +12,16 @@ module.exports = function(RED) {
         var node = this;
         
         function sendImageToClient(image, msg) {
-            if (Buffer.isBuffer(image)) {
-                image = image.toString("base64");
+            var d = { id:node.id }
+            if (image !== null) { 
+                if (Buffer.isBuffer(image)) {
+                    image = image.toString("base64");
+                }
+                d.data = image;
             }
                 
             try {
-                RED.comms.publish("image", { id:node.id, data:image });
+                RED.comms.publish("image", d);
                 if (msg.hasOwnProperty("filename")) { node.status({text:" " + msg.filename}); }
             }
             catch(e) {
@@ -29,23 +33,22 @@ module.exports = function(RED) {
             console.error(err);
             node.error(err, msg);
             node.status({ fill: "red", shape: "dot", text: statusText });
-		}
+        }
         
         function resizeJimpImage(jimpImage, msg) {
             // Resize the width as specified in the config screen, and scale the height accordingly (preserving aspect ratio)
-            jimpImage.resize(250, Jimp.AUTO);
+            jimpImage.resize(node.imageWidth, Jimp.AUTO);
             
             // Convert the resized image to a base64 string
             jimpImage.getBase64(Jimp.AUTO, (err, base64) => {
                 if (err) {
                     // Log the error and keep the original image (at its original size)
                     console.error(err);
-                    sendImageToClient(image, msg);
+                    sendImageToClient(jimpImage, msg);
                 }
                 else {
                     // Keep the base64 image from the data url
                     base64 = base64.replace(/^data:image\/[a-z]+;base64,/, "");
-                    
                     sendImageToClient(base64, msg);
                 }
             })
@@ -95,7 +98,7 @@ module.exports = function(RED) {
                 else {
                     if (!Buffer.isBuffer(image)) {
                         // Convert the base64 string to a buffer, so Jimp can process it
-                        image = new Buffer(image, 'base64');
+                        image = new Buffer.from(image, 'base64');
                     }
                     
                     Jimp.read(image).then(function(jimpImage) {
@@ -150,5 +153,5 @@ module.exports = function(RED) {
         else {
             res.sendStatus(404);
         }
-  });
+    });
 };
