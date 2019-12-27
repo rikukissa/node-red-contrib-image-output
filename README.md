@@ -61,7 +61,7 @@ When the node is already displaying an image, that previewed image can be hidden
 
 The following demo hides the previewed image based on the ```msg.payload```:
 
-![hide image](https://user-images.githubusercontent.com/14224149/71534163-11482880-28fd-11ea-9e91-9e1d00d530fd.gif)
+![hide image](https://user-images.githubusercontent.com/14224149/71534770-5f5f2b00-2901-11ea-96c2-081fbd3a028b.gif)
 
 ## Node configuration
 
@@ -70,6 +70,13 @@ The width (in pixels) that the image needs to be displayed in the flow.  The hei
 
 ## Image
 Specify how the input image will be delivered to this node.  By default the image needs to be delivered in the ```msg.payload``` of the input message.
+
+But there are a number of locations where this node can get the input image:
+1. ***msg***: image will be read from an input message.
+1. ***flow***: image will be read from in a flow variable.
+1. ***global***: image will be read from a global variable.
+1. ***string***: image will be specified as a fixed base64 string.
+1. ***buffer***: image will be specified as a fixed buffer.
 
 ### Resize images on server side
 By transferring smaller images the bandwith can be reduced, i.e. the number of bytes that is being send across the network.  When too much data is pushed (across the websocket), the flow editor can become ***unresponse***!
