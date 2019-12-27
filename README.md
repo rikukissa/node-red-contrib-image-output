@@ -16,36 +16,52 @@ npm install --save node-red-contrib-image-output
 ```
 
 ## Node usage
-This node can be used to preview images inside the Node-RED flow editor.  The following examples explain how the different kind of input image formats can be visualized.  All these example flows are also available via the *'Import'* menu in the Node-RED flow editor.
+This node can be used to preview images inside the Node-RED flow editor.
 
-### Buffer input image
-Apply an image as a binary Buffer (i.e. bits and bytes ...):
+### Send image to preview
+The following examples explain how the different kind of input image formats can be visualized.  All these example flows are also available via the *'Import'* menu in the Node-RED flow editor.
 
-![Buffer flow](https://user-images.githubusercontent.com/14224149/71359306-52061180-258c-11ea-9b69-6f82e3c727a3.png)
+1. ***Buffer input image***
 
-```
-[{"id":"46ffc819.b736f8","type":"http request","z":"30fb1577.8f556a","name":"","method":"GET","ret":"bin","paytoqs":false,"url":"https://dummyimage.com/200x150/000/fff&text={{{payload}}}","tls":"","persist":false,"proxy":"","authType":"","x":610,"y":640,"wires":[["d603e881.2fa1c8"]]},{"id":"25d928c1.708098","type":"inject","z":"30fb1577.8f556a","name":"Generate next image","topic":"","payload":"","payloadType":"date","repeat":"","crontab":"","once":false,"onceDelay":0.1,"x":200,"y":640,"wires":[["878f8ec1.effe4"]]},{"id":"878f8ec1.effe4","type":"function","z":"30fb1577.8f556a","name":"image counter","func":"var count = flow.get(\"count\")||0;\n\ncount++;\n\nnode.status({fill:\"blue\",shape:\"ring\",text:\"Image \" + count});\n\n// Save the new value back to context so it will be available next time\nflow.set('count',count);\n\n// Update the message payload and return - no need to create a new msg\nmsg.payload = \"Image \" + count;\nreturn msg;","outputs":1,"noerr":0,"x":420,"y":640,"wires":[["46ffc819.b736f8"]]},{"id":"d603e881.2fa1c8","type":"image","z":"30fb1577.8f556a","name":"","width":160,"data":"payload","dataType":"msg","thumbnail":true,"active":true,"x":800,"y":640,"wires":[]}]
-```
+   Apply an image as a binary Buffer (i.e. bits and bytes ...):
 
-### Base64 input image
-Apply an image as a base64 encoded string:
+   ![Buffer flow](https://user-images.githubusercontent.com/14224149/71359306-52061180-258c-11ea-9b69-6f82e3c727a3.png)
 
-![Base64 flow](https://user-images.githubusercontent.com/14224149/71359400-985b7080-258c-11ea-8636-dab883c43932.png)
+   ```
+   [{"id":"46ffc819.b736f8","type":"http request","z":"30fb1577.8f556a","name":"","method":"GET","ret":"bin","paytoqs":false,"url":"https://dummyimage.com/200x150/000/fff&text={{{payload}}}","tls":"","persist":false,"proxy":"","authType":"","x":610,"y":640,"wires":[["d603e881.2fa1c8"]]},{"id":"25d928c1.708098","type":"inject","z":"30fb1577.8f556a","name":"Generate next image","topic":"","payload":"","payloadType":"date","repeat":"","crontab":"","once":false,"onceDelay":0.1,"x":200,"y":640,"wires":[["878f8ec1.effe4"]]},{"id":"878f8ec1.effe4","type":"function","z":"30fb1577.8f556a","name":"image counter","func":"var count = flow.get(\"count\")||0;\n\ncount++;\n\nnode.status({fill:\"blue\",shape:\"ring\",text:\"Image \" + count});\n\n// Save the new value back to context so it will be available next time\nflow.set('count',count);\n\n// Update the message payload and return - no need to create a new msg\nmsg.payload = \"Image \" + count;\nreturn msg;","outputs":1,"noerr":0,"x":420,"y":640,"wires":[["46ffc819.b736f8"]]},{"id":"d603e881.2fa1c8","type":"image","z":"30fb1577.8f556a","name":"","width":160,"data":"payload","dataType":"msg","thumbnail":true,"active":true,"x":800,"y":640,"wires":[]}]
+   ```
 
-```
-[{"id":"46ffc819.b736f8","type":"http request","z":"30fb1577.8f556a","name":"","method":"GET","ret":"bin","paytoqs":false,"url":"https://dummyimage.com/200x150/000/fff&text={{{payload}}}","tls":"","persist":false,"proxy":"","authType":"","x":610,"y":640,"wires":[["27a53fad.5c768"]]},{"id":"25d928c1.708098","type":"inject","z":"30fb1577.8f556a","name":"Generate next image","topic":"","payload":"","payloadType":"date","repeat":"","crontab":"","once":false,"onceDelay":0.1,"x":200,"y":640,"wires":[["878f8ec1.effe4"]]},{"id":"878f8ec1.effe4","type":"function","z":"30fb1577.8f556a","name":"image counter","func":"var count = flow.get(\"count\")||0;\n\ncount++;\n\nnode.status({fill:\"blue\",shape:\"ring\",text:\"Image \" + count});\n\n// Save the new value back to context so it will be available next time\nflow.set('count',count);\n\n// Update the message payload and return - no need to create a new msg\nmsg.payload = \"Image \" + count;\nreturn msg;","outputs":1,"noerr":0,"x":420,"y":640,"wires":[["46ffc819.b736f8"]]},{"id":"27a53fad.5c768","type":"base64","z":"30fb1577.8f556a","name":"","action":"str","property":"payload","x":780,"y":640,"wires":[["d603e881.2fa1c8"]]},{"id":"d603e881.2fa1c8","type":"image","z":"30fb1577.8f556a","name":"","width":160,"data":"payload","dataType":"msg","thumbnail":true,"active":true,"x":960,"y":640,"wires":[]}]
-```
+1. ***Base64 input image***
 
-### Jimp input image
-Apply an image as a Jimp object.  This node allows Jimp images to be previewed, which are send by other Jimp related nodes.  The following example shows a Jimp image, generated by the [node-red-contrib-image-tools](https://www.npmjs.com/package/node-red-contrib-image-tools) nodes:
+   Apply an image as a base64 encoded string:
 
-![Jimp flow](https://user-images.githubusercontent.com/14224149/71359517-f25c3600-258c-11ea-9086-0b298f92b69b.png)
+   ![Base64 flow](https://user-images.githubusercontent.com/14224149/71359400-985b7080-258c-11ea-8636-dab883c43932.png)
 
-```
-[{"id":"27719e17.2169f2","type":"jimp-image","z":"30fb1577.8f556a","name":"","data":"payload","dataType":"msg","ret":"img","parameter1":"","parameter1Type":"msg","parameter2":"","parameter2Type":"msg","parameter3":"","parameter3Type":"msg","parameter4":"","parameter4Type":"msg","parameter5":"","parameter5Type":"msg","parameter6":"","parameter6Type":"msg","parameter7":"","parameter7Type":"msg","parameter8":"","parameter8Type":"msg","parameterCount":0,"jimpFunction":"none","selectedJimpFunction":{"name":"none","fn":"none","description":"Just loads the image.","parameters":[]},"x":770,"y":640,"wires":[["d603e881.2fa1c8"]]},{"id":"46ffc819.b736f8","type":"http request","z":"30fb1577.8f556a","name":"","method":"GET","ret":"bin","paytoqs":false,"url":"https://dummyimage.com/200x150/000/fff&text={{{payload}}}","tls":"","persist":false,"proxy":"","authType":"","x":610,"y":640,"wires":[["27719e17.2169f2"]]},{"id":"25d928c1.708098","type":"inject","z":"30fb1577.8f556a","name":"Generate next image","topic":"","payload":"","payloadType":"date","repeat":"","crontab":"","once":false,"onceDelay":0.1,"x":200,"y":640,"wires":[["878f8ec1.effe4"]]},{"id":"878f8ec1.effe4","type":"function","z":"30fb1577.8f556a","name":"image counter","func":"var count = flow.get(\"count\")||0;\n\ncount++;\n\nnode.status({fill:\"blue\",shape:\"ring\",text:\"Image \" + count});\n\n// Save the new value back to context so it will be available next time\nflow.set('count',count);\n\n// Update the message payload and return - no need to create a new msg\nmsg.payload = \"Image \" + count;\nreturn msg;","outputs":1,"noerr":0,"x":420,"y":640,"wires":[["46ffc819.b736f8"]]},{"id":"d603e881.2fa1c8","type":"image","z":"30fb1577.8f556a","name":"","width":160,"data":"payload","dataType":"msg","thumbnail":true,"active":true,"x":960,"y":640,"wires":[]}]
-```
+   ```
+   [{"id":"46ffc819.b736f8","type":"http request","z":"30fb1577.8f556a","name":"","method":"GET","ret":"bin","paytoqs":false,"url":"https://dummyimage.com/200x150/000/fff&text={{{payload}}}","tls":"","persist":false,"proxy":"","authType":"","x":610,"y":640,"wires":[["27a53fad.5c768"]]},{"id":"25d928c1.708098","type":"inject","z":"30fb1577.8f556a","name":"Generate next image","topic":"","payload":"","payloadType":"date","repeat":"","crontab":"","once":false,"onceDelay":0.1,"x":200,"y":640,"wires":[["878f8ec1.effe4"]]},{"id":"878f8ec1.effe4","type":"function","z":"30fb1577.8f556a","name":"image counter","func":"var count = flow.get(\"count\")||0;\n\ncount++;\n\nnode.status({fill:\"blue\",shape:\"ring\",text:\"Image \" + count});\n\n// Save the new value back to context so it will be available next time\nflow.set('count',count);\n\n// Update the message payload and return - no need to create a new msg\nmsg.payload = \"Image \" + count;\nreturn msg;","outputs":1,"noerr":0,"x":420,"y":640,"wires":[["46ffc819.b736f8"]]},{"id":"27a53fad.5c768","type":"base64","z":"30fb1577.8f556a","name":"","action":"str","property":"payload","x":780,"y":640,"wires":[["d603e881.2fa1c8"]]},{"id":"d603e881.2fa1c8","type":"image","z":"30fb1577.8f556a","name":"","width":160,"data":"payload","dataType":"msg","thumbnail":true,"active":true,"x":960,"y":640,"wires":[]}]
+   ```
 
-Remark: the node-red-contrib-image-tools node should be installed, prior to importing this latter example!
+1. ***Jimp input image***
+
+   Apply an image as a Jimp object.  This node allows Jimp images to be previewed, which are send by other Jimp related nodes.  The following example shows a Jimp image, generated by the [node-red-contrib-image-tools](https://www.npmjs.com/package/node-red-contrib-image-tools) nodes:
+
+   ![Jimp flow](https://user-images.githubusercontent.com/14224149/71359517-f25c3600-258c-11ea-9086-0b298f92b69b.png)
+
+   ```
+   [{"id":"27719e17.2169f2","type":"jimp-image","z":"30fb1577.8f556a","name":"","data":"payload","dataType":"msg","ret":"img","parameter1":"","parameter1Type":"msg","parameter2":"","parameter2Type":"msg","parameter3":"","parameter3Type":"msg","parameter4":"","parameter4Type":"msg","parameter5":"","parameter5Type":"msg","parameter6":"","parameter6Type":"msg","parameter7":"","parameter7Type":"msg","parameter8":"","parameter8Type":"msg","parameterCount":0,"jimpFunction":"none","selectedJimpFunction":{"name":"none","fn":"none","description":"Just loads the image.","parameters":[]},"x":770,"y":640,"wires":[["d603e881.2fa1c8"]]},{"id":"46ffc819.b736f8","type":"http request","z":"30fb1577.8f556a","name":"","method":"GET","ret":"bin","paytoqs":false,"url":"https://dummyimage.com/200x150/000/fff&text={{{payload}}}","tls":"","persist":false,"proxy":"","authType":"","x":610,"y":640,"wires":[["27719e17.2169f2"]]},{"id":"25d928c1.708098","type":"inject","z":"30fb1577.8f556a","name":"Generate next image","topic":"","payload":"","payloadType":"date","repeat":"","crontab":"","once":false,"onceDelay":0.1,"x":200,"y":640,"wires":[["878f8ec1.effe4"]]},{"id":"878f8ec1.effe4","type":"function","z":"30fb1577.8f556a","name":"image counter","func":"var count = flow.get(\"count\")||0;\n\ncount++;\n\nnode.status({fill:\"blue\",shape:\"ring\",text:\"Image \" + count});\n\n// Save the new value back to context so it will be available next time\nflow.set('count',count);\n\n// Update the message payload and return - no need to create a new msg\nmsg.payload = \"Image \" + count;\nreturn msg;","outputs":1,"noerr":0,"x":420,"y":640,"wires":[["46ffc819.b736f8"]]},{"id":"d603e881.2fa1c8","type":"image","z":"30fb1577.8f556a","name":"","width":160,"data":"payload","dataType":"msg","thumbnail":true,"active":true,"x":960,"y":640,"wires":[]}]
+   ```
+
+   Remark: the node-red-contrib-image-tools node should be installed, prior to importing this latter example!
+
+### Hide previewed image
+When the node is already displaying an image, that previewed image can be hidden via one of those input images:
+1. A ```null``` image (e.g. ```msg.payload = null```).
+1. No image (e.g. ```delete msg.payload```).
+1. An empty string image (e.g. ```msg.payload = ""```).
+
+The following demo hides the previewed image based on the ```msg.payload```:
+
+![hide image](https://user-images.githubusercontent.com/14224149/71534163-11482880-28fd-11ea-9e91-9e1d00d530fd.gif)
 
 ## Node configuration
 
