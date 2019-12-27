@@ -207,15 +207,24 @@
 <script type="text/x-red" data-help-name="image">
     <p>Simple image output node. Useful for previewing results of face detecting, object recognition etc.</p>
     <p>The button on the node can be used to enable or disable its image output. It is recommended (for performance) to disable or remove any Image-Output nodes that are not being used.</p>
-    <p>Expects in the <code>msg.payload</code> a jpg or png image, in one of the following formats:
+    <p>Expects as input (e.g. in the <code>msg.payload</code>) a jpg or png image, in one of the following formats:
     <ul>
         <li>A base64 encoded string</li>
         <li>A buffer</li>
         <li>A Jimp image object</li>
     </ul>
     </p>
+    <p>The current previewed image can be hidden by sending one of following inputs:
+    <ul>
+        <li>A null image (e.g. <code>msg.payload = null</code>)</li>
+        <li>No image (e.g. <code>delete msg.payload</code>)</li>
+        <li>An empty string image (e.g. <code>msg.payload = ""</code>)</li>
+    </ul>
+    </p>
     <p><strong>Width:</strong><br/>
     The width (in pixels) that the image needs to be displayed in the flow.</p>  
+    <p><strong>Image:</strong><br/>
+    Specifies where this node has to get the input image (e.g. in the <code>msg.payload</code>).</p> 
     <p><strong>Resize images on server side:</strong><br/>
     When too much data is pushed to the browser, the flow editor can become unresponse!
     <ul>
