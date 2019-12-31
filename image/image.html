@@ -205,9 +205,10 @@
 </script>
 
 <script type="text/html" data-help-name="image">
-    <p>Simple image output node. Useful for previewing results of face detecting, object recognition etc.</p>
-    <p>The button on the node can be used to enable or disable its image output. It is recommended (for performance) to disable or remove any Image-Output nodes that are not being used.</p>
-    <p>Expects in the selected msg property (default <code>msg.payload</code>) a jpg or png image, in one of the following formats:
+    <p>Simple image output node. Useful for previewing results of face detecting, object recognition, etc.</p>
+    <p>The button on the node can be used to enable or disable the image preview. 
+    It is recommended (for performance) to disable or remove any Image-Output nodes that are not being used.</p>
+    <p>Expects the selected msg property (default <code>msg.payload</code>) to contain one of the following formats:
     <ul>
         <li>A base64 encoded string</li>
         <li>A buffer</li>
@@ -217,10 +218,11 @@
     <p><strong>Width:</strong><br/>
     The width (in pixels) that the image needs to be displayed in the flow.</p>  
     <p><strong>Resize images on server side:</strong><br/>
-    When too much data is pushed to the browser, the flow editor can become unresponse!
+    When too much data is pushed to the browser, the flow editor can become unresponse.
     <ul>
         <li>When activated, the images will be resized (to the specified width) on the server side.  Then those small thumbnail images will be send to the browser, to reduce the bandwith.</li>
         <li>When not activated, the (original) large images will be send to the browser.  Once they arrive there, the browser will resize them to the specified width.</li>
     </ul>
     </p> 
+    <p>Sending a blank or null payload will remove/hide the preview panel.</p>
 </script>
