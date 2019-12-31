@@ -7,7 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
-    "jimp-compact": "0.9.3"
+    "jimp-compact": "~0.9.3"
   },
   "bugs": {
     "url": "https://github.com/rikukissa/node-red-contrib-image-output/issues"
@@ -24,5 +24,13 @@
   },
   "keywords": ["node-red", "image", "inspect"],
   "author": "Riku Rouvila",
+  "contributors": [
+    {
+      "name": "Dave Conway-Jones"
+    },
+    {
+      "name": "Bart Butenaers"
+    }
+  ]
   "license": "MIT"
 }

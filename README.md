@@ -10,9 +10,9 @@ The expected input should be a jpg or png image, which need to be delivered in o
 + A Jimp object
 
 ## Installation
-Run the following npm command in your Node-RED user directory (typically ~/.node-red):
+Either use the Editor - Menu - Manage Palette - Install option, or run the following npm command in your Node-RED user directory (typically `~/.node-red`):
 ```
-npm install --save node-red-contrib-image-output
+npm i node-red-contrib-image-output
 ```
 
 ## Node usage
@@ -41,24 +41,25 @@ Apply an image as a Jimp object.  This node allows Jimp images to be previewed, 
 
 ![Jimp flow](https://user-images.githubusercontent.com/14224149/71359517-f25c3600-258c-11ea-9086-0b298f92b69b.png)
 
+
+**Note**: the `node-red-contrib-image-tools` node should be installed, prior to importing this example.
+
 ```
 [{"id":"27719e17.2169f2","type":"jimp-image","z":"30fb1577.8f556a","name":"","data":"payload","dataType":"msg","ret":"img","parameter1":"","parameter1Type":"msg","parameter2":"","parameter2Type":"msg","parameter3":"","parameter3Type":"msg","parameter4":"","parameter4Type":"msg","parameter5":"","parameter5Type":"msg","parameter6":"","parameter6Type":"msg","parameter7":"","parameter7Type":"msg","parameter8":"","parameter8Type":"msg","parameterCount":0,"jimpFunction":"none","selectedJimpFunction":{"name":"none","fn":"none","description":"Just loads the image.","parameters":[]},"x":770,"y":640,"wires":[["d603e881.2fa1c8"]]},{"id":"46ffc819.b736f8","type":"http request","z":"30fb1577.8f556a","name":"","method":"GET","ret":"bin","paytoqs":false,"url":"https://dummyimage.com/200x150/000/fff&text={{{payload}}}","tls":"","persist":false,"proxy":"","authType":"","x":610,"y":640,"wires":[["27719e17.2169f2"]]},{"id":"25d928c1.708098","type":"inject","z":"30fb1577.8f556a","name":"Generate next image","topic":"","payload":"","payloadType":"date","repeat":"","crontab":"","once":false,"onceDelay":0.1,"x":200,"y":640,"wires":[["878f8ec1.effe4"]]},{"id":"878f8ec1.effe4","type":"function","z":"30fb1577.8f556a","name":"image counter","func":"var count = flow.get(\"count\")||0;\n\ncount++;\n\nnode.status({fill:\"blue\",shape:\"ring\",text:\"Image \" + count});\n\n// Save the new value back to context so it will be available next time\nflow.set('count',count);\n\n// Update the message payload and return - no need to create a new msg\nmsg.payload = \"Image \" + count;\nreturn msg;","outputs":1,"noerr":0,"x":420,"y":640,"wires":[["46ffc819.b736f8"]]},{"id":"d603e881.2fa1c8","type":"image","z":"30fb1577.8f556a","name":"","width":160,"data":"payload","dataType":"msg","thumbnail":true,"active":true,"x":960,"y":640,"wires":[]}]
 ```
-
-Remark: the node-red-contrib-image-tools node should be installed, prior to importing this latter example!
 
 ## Node configuration
 
 ### Width
 The width (in pixels) that the image needs to be displayed in the flow.  The height will be calculated automatically, with the same aspect ratio as the original image.
 
-## Image
+## Property
 Specify how the input image will be delivered to this node.  By default the image needs to be delivered in the ```msg.payload``` of the input message.
 
 ### Resize images on server side
-By transferring smaller images the bandwith can be reduced, i.e. the number of bytes that is being send across the network.  When too much data is pushed (across the websocket), the flow editor can become ***unresponse***!
+By transferring smaller images the bandwith can be reduced, i.e. the number of bytes that is being send across the network.  When too much data is pushed (across the websocket), the flow editor can become unresponsive.
 
 + When this option is activated, the images will be resized (to the specified width) on the server side.  Then those small thumbnail images will be send to the browser, to reduce the bandwith. 
 + When this option is not activated, the (original) large images will be send to the browser.  Once they arrive there, the browser will resize them to the specified width.  As a result much more data needs to be transferred between the server and the browser.
         
-Caution: resizing images on the server will require server-side CPU usage.  So it has to be decided what is prefferd: lower bandwidth or lower cpu usage on the server.  This decision will depend on the use case...
+**Caution**: resizing images on the server will require server-side CPU usage.  So it has to be decided what is prefered: lower bandwidth or lower cpu usage on the server.  This decision will depend on the use case and hardware...

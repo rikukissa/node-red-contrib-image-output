@@ -184,24 +184,24 @@
 </script>
 
 <script type="text/html" data-template-name="image">
-  <div class="form-row">
-    <label for="node-input-width"><i class="fa fa-arrows-h"></i> Width</label>
-    <input type="number" id="node-input-width">
-  </div>
-  <div class="form-row">
-    <label style="padding-top: 8px" for="node-input-data"><i class="fa fa-file-image-o"></i> Image</label>
-    <input type="text" id="node-input-data" style="width:70%">
-    <input type="hidden" id="node-input-dataType">
-  </div>
-  <div class="form-row">
-    <label>&nbsp;</label>
-    <input type="checkbox" id="node-input-thumbnail" style="display: inline-block; width: auto; vertical-align: top;">
-    <label for="node-input-thumbnail" style="width:70%;"> Resize images on server side</label>
-  </div> 
-  <div class="form-row">
-    <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
-    <input type="text" id="node-input-name" placeholder="Name">
-  </div>
+    <div class="form-row">
+        <label style="padding-top: 8px" for="node-input-data"><i class="fa fa-ellipsis-h"></i> Property</label>
+        <input type="text" id="node-input-data" style="width:70%">
+        <input type="hidden" id="node-input-dataType">
+    </div>
+    <div class="form-row">
+        <label for="node-input-width"><i class="fa fa-arrows-h"></i> Width</label>
+        <input type="number" id="node-input-width">
+    </div>
+    <div class="form-row">
+        <label>&nbsp;</label>
+        <input type="checkbox" id="node-input-thumbnail" style="display: inline-block; width: auto; vertical-align: top;">
+        <label for="node-input-thumbnail" style="width:70%;"> Resize images on server side</label>
+    </div> 
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
 </script>
 
 <script type="text/html" data-help-name="image">
@@ -215,6 +215,7 @@
         <li>A Jimp image object</li>
     </ul>
     </p>
+    <p>Sending a blank or null payload will remove/hide the preview panel.</p>
     <p><strong>Width:</strong><br/>
     The width (in pixels) that the image needs to be displayed in the flow.</p>  
     <p><strong>Resize images on server side:</strong><br/>
@@ -224,5 +225,4 @@
         <li>When not activated, the (original) large images will be send to the browser.  Once they arrive there, the browser will resize them to the specified width.</li>
     </ul>
     </p> 
-    <p>Sending a blank or null payload will remove/hide the preview panel.</p>
 </script>
