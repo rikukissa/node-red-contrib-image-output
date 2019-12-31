@@ -53,7 +53,7 @@ Apply an image as a Jimp object.  This node allows Jimp images to be previewed, 
 ### Width
 The width (in pixels) that the image needs to be displayed in the flow.  The height will be calculated automatically, with the same aspect ratio as the original image.
 
-## Property
+### Property
 Specify how the input image will be delivered to this node.  By default the image needs to be delivered in the ```msg.payload``` of the input message.
 
 ### Resize images on server side
