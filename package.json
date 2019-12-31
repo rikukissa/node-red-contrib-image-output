@@ -1,4 +1,4 @@
-  
+
 {
   "name": "node-red-contrib-image-output",
   "version": "0.5.0",
@@ -31,6 +31,6 @@
     {
       "name": "Bart Butenaers"
     }
-  ]
+  ],
   "license": "MIT"
 }
