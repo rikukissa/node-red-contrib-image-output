@@ -30,9 +30,8 @@ module.exports = function(RED) {
         }
         
         function handleError(err, msg, statusText) {
-            console.error(err);
             node.error(err, msg);
-            node.status({ fill: "red", shape: "dot", text: statusText });
+            node.status({ fill:"red", shape:"dot", text:statusText });
         }
         
         function resizeJimpImage(jimpImage, msg) {
@@ -86,7 +85,7 @@ module.exports = function(RED) {
             }
         
             if (!Buffer.isBuffer(image) && (typeof image !== 'string') && !(image instanceof String) && !isJimpObject(image)) {
-                node.error("Input should be a buffer or a base64 string or a Jimp image (containing a jpg or png image)");
+                node.error("Input should be a buffer or a base64 string or a Jimp image (containing a jpg or png image)",msg);
                 return;
             }
             

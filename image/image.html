@@ -89,7 +89,7 @@
       $('#node-input-data').typedInput({
         default: 'msg',
         typeField: $("#node-input-dataType"),
-        types: ['msg','flow','global','str','bin']
+        types: ['msg']
       });
     }
   });
@@ -183,7 +183,7 @@
 
 </script>
 
-<script type="text/x-red" data-template-name="image">
+<script type="text/html" data-template-name="image">
   <div class="form-row">
     <label for="node-input-width"><i class="fa fa-arrows-h"></i> Width</label>
     <input type="number" id="node-input-width">
@@ -204,10 +204,10 @@
   </div>
 </script>
 
-<script type="text/x-red" data-help-name="image">
+<script type="text/html" data-help-name="image">
     <p>Simple image output node. Useful for previewing results of face detecting, object recognition etc.</p>
     <p>The button on the node can be used to enable or disable its image output. It is recommended (for performance) to disable or remove any Image-Output nodes that are not being used.</p>
-    <p>Expects in the <code>msg.payload</code> a jpg or png image, in one of the following formats:
+    <p>Expects in the selected msg property (default <code>msg.payload</code>) a jpg or png image, in one of the following formats:
     <ul>
         <li>A base64 encoded string</li>
         <li>A buffer</li>
