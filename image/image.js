@@ -3,13 +3,15 @@ module.exports = function(RED) {
     
     function ImageNode(config) {
         RED.nodes.createNode(this, config);
-        this.imageWidth = config.width;
+        this.imageWidth = parseInt(config.width || 160);
         this.data       = config.data || "";
         this.dataType   = config.dataType || "msg";
         this.thumbnail  = config.thumbnail;
         this.active     = (config.active === null || typeof config.active === "undefined") || config.active;
+        this.pass       = config.pass;
         
         var node = this;
+        var oldimage;
         
         function sendImageToClient(image, msg) {
             var d = { id:node.id }
@@ -30,8 +32,8 @@ module.exports = function(RED) {
         }
         
         function handleError(err, msg, statusText) {
-            node.error(err, msg);
             node.status({ fill:"red", shape:"dot", text:statusText });
+            node.error(err, msg);
         }
         
         function resizeJimpImage(jimpImage, msg) {
@@ -42,8 +44,9 @@ module.exports = function(RED) {
             jimpImage.getBase64(Jimp.AUTO, (err, base64) => {
                 if (err) {
                     // Log the error and keep the original image (at its original size)
-                    console.error(err);
-                    sendImageToClient(jimpImage, msg);
+                    node.status({ fill:"red", shape:"dot", text:"Resize failed" });
+                    node.log(err.toString());
+                    sendImageToClient(oldimage, msg);
                 }
                 else {
                     // Keep the base64 image from the data url
@@ -62,11 +65,9 @@ module.exports = function(RED) {
         node.on("input", function(msg) {
             var image;
             
-            if (this.active !== true) {
-                return;
-            }
+            if (this.active !== true) { return; }
             
-            node.status({});
+            if (node.pass) { node.send(msg); }
             
             // Get the image from the location specified in the typedinput field
             RED.util.evaluateNodeProperty(node.data, node.dataType, node, msg, (err, value) => {
@@ -78,7 +79,7 @@ module.exports = function(RED) {
                 }
             });
             
-            // Reset the image in case an emtpy payload arrives
+            // Reset the image in case an empty payload arrives
             if (!image || image === "") {
                 sendImageToClient(null, msg);
                 return;
@@ -91,17 +92,18 @@ module.exports = function(RED) {
             
             if (node.thumbnail) {
                 if (isJimpObject(image)) {
-                    // Use the input Jimp image straigth away, for maximum performance
+                    // Use the input Jimp image straight away, for maximum performance
                     resizeJimpImage(image, msg);
                 }
                 else {
                     if (!Buffer.isBuffer(image)) {
                         // Convert the base64 string to a buffer, so Jimp can process it
-                        image = new Buffer.from(image, 'base64');
+                        image = new Buffer.from(image.replace(/^data:image\/[a-z]+;base64,/, ""), 'base64');
                     }
-                    
+                    oldimage = image;
                     Jimp.read(image).then(function(jimpImage) {
-                        resizeJimpImage(jimpImage, msg);       
+                        resizeJimpImage(jimpImage, msg); 
+                        node.status("");      
                     }).catch(function(err) {
                         // Log the error and keep the original image (at its original size)
                         handleError(err, msg, "Resize failed");
@@ -114,12 +116,14 @@ module.exports = function(RED) {
                     image.getBase64(Jimp.AUTO, (err, base64) => {
                         // Keep the base64 image from the data url
                         base64 = base64.replace(/^data:image\/[a-z]+;base64,/, "");
-                    
                         sendImageToClient(base64, msg);
                     })
                 }
                 else {
-                    sendImageToClient(image, msg);
+                    if (typeof image === "string") {
+                        sendImageToClient(image.replace(/^data:image\/[a-z]+;base64,/, ""), msg);
+                    }
+                    else { sendImageToClient(image, msg) }
                 }
             }
         });

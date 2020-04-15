@@ -16,15 +16,11 @@
                 required: true,
                 validate: RED.validators.typedInput("dataType")
             },
-            dataType: {
-                value: "msg"
-            },
-            thumbnail: {
-                value: false
-            },
-            active: {
-                value: true
-            }
+            dataType: { value: "msg" },
+            thumbnail: { value: false },
+            active: { value: true },
+            pass: { value: false },
+            outputs: {value: 0}
         },
         inputs: 1,
         outputs: 0,
@@ -42,6 +38,7 @@
         },
         button: {
             toggle: "active",
+            visible: function() { return !this.pass; },
             onclick: function () {
                 const label = this.name || "image preview";
                 var node = this;
@@ -87,6 +84,7 @@
             }
         },
         oneditprepare: function () {
+            var that = this;
             // Set a default width of 160 for existing nodes that don't have that field yet.
             $('#node-input-width').val(this.width || DEFAULT_IMAGE_WIDTH);
 
@@ -94,6 +92,19 @@
                 default: 'msg',
                 typeField: $("#node-input-dataType"),
                 types: ['msg']
+            });
+            var checkout = function() {
+                
+            }
+            if ($("#node-input-pass").is(":checked")) { that.outputs = 1; }
+            $("#node-input-pass").change(function() {
+                if ($("#node-input-pass").is(":checked")) {
+                    that.outputs = 1;
+                    that.active = true;
+                }
+                else {
+                    that.outputs = 0;
+                }
             });
         }
     });
@@ -199,8 +210,13 @@
     </div>
     <div class="form-row">
         <label>&nbsp;</label>
-        <input type="checkbox" id="node-input-thumbnail" style="display: inline-block; width: auto; vertical-align: top;">
+        <input type="checkbox" id="node-input-thumbnail" style="display:inline-block; width:auto; vertical-align:top;">
         <label for="node-input-thumbnail" style="width:70%;"> Resize images on server side</label>
+    </div>
+    <div class="form-row">
+        <label>&nbsp;</label>
+        <input type="checkbox" id="node-input-pass" style="display:inline-block; width:auto; vertical-align:top;">
+        <label for="node-input-pass" style="width:70%;"> Allow image passthrough</label>
     </div> 
     <div class="form-row">
         <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
