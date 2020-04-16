@@ -21,7 +21,6 @@ module.exports = function(RED) {
                 }
                 d.data = image;
             }
-                
             try {
                 RED.comms.publish("image", d);
                 if (msg.hasOwnProperty("filename")) { node.status({text:" " + msg.filename}); }

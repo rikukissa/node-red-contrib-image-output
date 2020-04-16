@@ -180,8 +180,14 @@
             $bubble.setAttribute('points', points)
         }
 
-        $img.setAttribute('href', "data:image/png;base64," + data)
-        i.src = "data:image/png;base64," + data;
+        if (data.startsWith("http")) {
+            $img.setAttribute('href', data);
+            i.src = data;
+        }
+        else {
+            $img.setAttribute('href', "data:image/png;base64," + data);
+            i.src = "data:image/png;base64," + data;
+        }
     }
 
     RED.events.on("editor:save", redraw)
