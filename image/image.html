@@ -143,7 +143,7 @@
 
             const bubble = document.createElementNS("http://www.w3.org/2000/svg", 'polyline')
             bubble.setAttribute('id', "image-output-bubble-" + id)
-            bubble.setAttribute('style', 'fill:#A7BBCE')
+            bubble.setAttribute('style', 'fill:#E8F0E8')
             bubble.setAttribute('stroke', '#999999')
             $container.insertBefore(bubble, $container.lastChild.nextSibling)
 
@@ -231,7 +231,7 @@
 </script>
 
 <script type="text/html" data-help-name="image">
-    <p>Simple image output node. Useful for previewing results of face detecting, object recognition, etc.</p>
+    <p>Simple image output node. Useful for previewing results of face detection, object recognition, etc.</p>
     <p>The button on the node can be used to enable or disable the image preview. 
     It is recommended (for performance) to disable or remove any Image-Output nodes that are not being used.</p>
     <p>Expects the selected msg property (default <code>msg.payload</code>) to contain one of the following formats:
@@ -239,6 +239,7 @@
         <li>A base64 encoded string</li>
         <li>A buffer</li>
         <li>A Jimp image object</li>
+        <li>A url to an image</li>
     </ul>
     </p>
     <p>Sending a blank or null payload will remove/hide the preview panel.</p>
@@ -250,5 +251,8 @@
         <li>When activated, the images will be resized (to the specified width) on the server side.  Then those small thumbnail images will be send to the browser, to reduce the bandwith.</li>
         <li>When not activated, the (original) large images will be send to the browser.  Once they arrive there, the browser will resize them to the specified width.</li>
     </ul>
+    <p><strong>Allow image passthrough:</strong><br/>
+    When selected this adds an output wire to the node in order to pass the original message through to a following node.
+    This performs better than forking the wires, however it does remove the enable/disable button.
     </p> 
 </script>

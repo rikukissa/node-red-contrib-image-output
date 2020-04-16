@@ -8,6 +8,7 @@ The expected input should be a jpg or png image, which need to be delivered in o
 + A buffer
 + A base64 encoded string
 + A Jimp object
++ A url to an image
 
 ## Installation
 Either use the Editor - Menu - Manage Palette - Install option, or run the following npm command in your Node-RED user directory (typically `~/.node-red`):
@@ -82,5 +83,10 @@ By transferring smaller images the bandwith can be reduced, i.e. the number of b
 
 + When this option is activated, the images will be resized (to the specified width) on the server side.  Then those small thumbnail images will be send to the browser, to reduce the bandwith. 
 + When this option is not activated, the (original) large images will be send to the browser.  Once they arrive there, the browser will resize them to the specified width.  As a result much more data needs to be transferred between the server and the browser.
-        
+
 **Caution**: resizing images on the server will require server-side CPU usage.  So it has to be decided what is prefered: lower bandwidth or lower cpu usage on the server.  This decision will depend on the use case and hardware...
+
+### Allow image passthrough
+When selected this adds an output wire to the node in order to pass the original message through to a following node.
+This performs better than forking the wires, however it does remove the enable/disable button.
+        
