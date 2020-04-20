@@ -111,7 +111,7 @@
 
     const latestImages = {}
 
-    function remove(nodeid) {
+    var remove = function(nodeid) {
         const id = nodeid
         const $img = document.getElementById("image-output-img-" + id)
         const $bubble = document.getElementById("image-output-bubble-" + id)
@@ -121,7 +121,7 @@
         delete latestImages[id]
     }
 
-    function redraw(node) {
+    var redraw = function(node) {
         const id = node.id
         const $img = document.getElementById("image-output-img-" + id)
         const $bubble = document.getElementById("image-output-bubble-" + id)
@@ -134,7 +134,7 @@
         }
     }
 
-    function render(id, data, node) {
+    var render = function(id, data, node) {
         let i = new Image();
         let $img = document.getElementById("image-output-img-" + id)
         if (!$img) {
@@ -152,7 +152,7 @@
             img.setAttribute('x', '0')
             img.setAttribute('y', '45')
             img.setAttribute('width', node.width || DEFAULT_IMAGE_WIDTH)
-            img.setAttribute('onclick', 'remove("' + id + '")')
+            img.addEventListener("click", function(){remove(id)}, {once:true})
             $container.insertBefore(img, $container.lastChild.nextSibling)
             $img = img
         }
