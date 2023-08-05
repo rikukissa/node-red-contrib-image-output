@@ -1,6 +1,6 @@
 module.exports = function(RED) {
-    var Jimp = require('jimp-compact'); 
-    
+    var Jimp = require('jimp-compact');
+
     function ImageNode(config) {
         RED.nodes.createNode(this, config);
         this.imageWidth = parseInt(config.width || 160);
@@ -9,13 +9,13 @@ module.exports = function(RED) {
         this.thumbnail  = config.thumbnail;
         this.active     = (config.active === null || typeof config.active === "undefined") || config.active;
         this.pass       = config.pass;
-        
+
         var node = this;
         var oldimage;
-        
+
         function sendImageToClient(image, msg) {
             var d = { id:node.id }
-            if (image !== null) { 
+            if (image !== null) {
                 if (Buffer.isBuffer(image)) {
                     image = image.toString("base64");
                 }
@@ -29,16 +29,16 @@ module.exports = function(RED) {
                 node.error("Invalid image", msg);
             }
         }
-        
+
         function handleError(err, msg, statusText) {
             node.status({ fill:"red", shape:"dot", text:statusText });
             node.error(err, msg);
         }
-        
+
         function resizeJimpImage(jimpImage, msg) {
             // Resize the width as specified in the config screen, and scale the height accordingly (preserving aspect ratio)
             jimpImage.resize(node.imageWidth, Jimp.AUTO);
-            
+
             // Convert the resized image to a base64 string
             jimpImage.getBase64(Jimp.AUTO, (err, base64) => {
                 if (err) {
@@ -54,7 +54,7 @@ module.exports = function(RED) {
                 }
             })
         }
-        
+
         function isJimpObject(image) {
             // For some reason "instanceof Jimp" does not always work...
             // See https://discourse.nodered.org/t/checking-object-instance/19482
@@ -63,11 +63,11 @@ module.exports = function(RED) {
 
         node.on("input", function(msg) {
             var image;
-            
+
             if (this.active !== true) { return; }
-            
+
             if (node.pass) { node.send(msg); }
-            
+
             // Get the image from the location specified in the typedinput field
             RED.util.evaluateNodeProperty(node.data, node.dataType, node, msg, (err, value) => {
                 if (err) {
@@ -77,18 +77,19 @@ module.exports = function(RED) {
                     image = value;
                 }
             });
-            
+
             // Reset the image in case an empty payload arrives
             if (!image || image === "") {
+                node.status("");
                 sendImageToClient(null, msg);
                 return;
             }
-        
+
             if (!Buffer.isBuffer(image) && (typeof image !== 'string') && !(image instanceof String) && !isJimpObject(image)) {
                 node.error("Input should be a buffer or a base64 string or a Jimp image (containing a jpg or png image)",msg);
                 return;
             }
-            
+
             if (node.thumbnail) {
                 if (isJimpObject(image)) {
                     // Use the input Jimp image straight away, for maximum performance
@@ -101,8 +102,7 @@ module.exports = function(RED) {
                     }
                     oldimage = image;
                     Jimp.read(image).then(function(jimpImage) {
-                        resizeJimpImage(jimpImage, msg); 
-                        node.status("");      
+                        resizeJimpImage(jimpImage, msg);
                     }).catch(function(err) {
                         // Log the error and keep the original image (at its original size)
                         handleError(err, msg, "Resize failed");
@@ -110,7 +110,7 @@ module.exports = function(RED) {
                     });
                 }
             }
-            else {    
+            else {
                 if (isJimpObject(image)) {
                     image.getBase64(Jimp.AUTO, (err, base64) => {
                         // Keep the base64 image from the data url
@@ -133,15 +133,15 @@ module.exports = function(RED) {
         });
     }
     RED.nodes.registerType("image", ImageNode);
-    
+
     // Via the button on the node (in the FLOW EDITOR), the image pushing can be enabled or disabled
     RED.httpAdmin.post("/image-output/:id/:state", RED.auth.needsPermission("image-output.write"), function(req,res) {
         var state = req.params.state;
         var node = RED.nodes.getNode(req.params.id);
-        
+
         if(node === null || typeof node === "undefined") {
             res.sendStatus(404);
-            return;  
+            return;
         }
 
         if (state === "enable") {
